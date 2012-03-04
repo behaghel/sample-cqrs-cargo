@@ -10,20 +10,24 @@ class Test extends Specification {
       import model.event._
       import service.CargoService._
 
-      val sf = ports.add(Port("San Fransico")).get
-      val la = ports.add(Port("Los Angeles")).get
+      val SF = Port("San Francisco")
+      val LA = Port("Los Angeles")
 
-      val cargo = cargos.add(Cargo("Refactoring")).get
+      val cargo = Cargo("Refactoring")
 
-      var ship = ships.add(Ship("King Roy", Some(la), Set())).get
+      val ship = Ship("King Roy", Some(LA), Set())
+      Ships.add(ship)
 
-      ship = ships.load(LoadEvent(ship, cargo, new Date)).get
-      ship = ships.departure(DepartureEvent(ship, la, new Date)).get
-      ship = ships.arrival(ArrivalEvent(ship, sf, new Date)).get
+      val movements = for {
+        _ <- ship.load(cargo)
+        _ <- ship.leave()
+        f <- ship.arrive(at = SF)
+      } yield f
+      movements(ship) //log events, update ref in Repo
 
       ships.audit("King Roy").foreach(println)
 
-      ship.port must beEqualTo(Some(sf))
+      ship.port must beEqualTo(Some(SF))
     }
   }
 }
