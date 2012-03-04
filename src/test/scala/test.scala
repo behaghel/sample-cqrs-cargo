@@ -15,7 +15,7 @@ class Test extends Specification {
 
       val cargo = cargos.add(Cargo("Refactoring")).get
 
-      var ship = ships.add(Ship("King Roy", la, Set())).get
+      var ship = ships.add(Ship("King Roy", Some(la), Set())).get
 
       ship = ships.load(LoadEvent(ship, cargo, new Date)).get
       ship = ships.departure(DepartureEvent(ship, la, new Date)).get
@@ -23,7 +23,7 @@ class Test extends Specification {
 
       ships.audit("King Roy").foreach(println)
 
-      ship.port must beEqualTo(sf)
+      ship.port must beEqualTo(Some(sf))
     }
   }
 }

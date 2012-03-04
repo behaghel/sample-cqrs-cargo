@@ -13,7 +13,8 @@ scalacOptions += "-deprecation"
 scalacOptions += "-Ydependent-method-types"
 
 libraryDependencies ++= Seq(
-  "org.specs2" %% "specs2" % "1.7.1" % "test"
+  "org.specs2" %% "specs2" % "1.7.1" % "test",
+  "org.scalaz" %% "scalaz-core" % "7.0-SNAPSHOT"
 )
 
 resolvers ++= Seq(
