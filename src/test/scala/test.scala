@@ -23,11 +23,11 @@ class Test extends Specification {
         _ <- ship.leave()
         f <- ship.arrive(at = SF)
       } yield f
-      movements(ship) //log events, update ref in Repo
+      val mship = movements.exec(ship) //log events, update ref in Repo
 
       ships.audit("King Roy").foreach(println)
 
-      ship.port must beEqualTo(Some(SF))
+      mship.port must beEqualTo(Some(SF))
     }
   }
 }

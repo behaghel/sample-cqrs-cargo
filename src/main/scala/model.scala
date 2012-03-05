@@ -40,20 +40,25 @@ case class Cargo(id: String) extends Entity[String]
 
 case class Port(id: String) extends Entity[String]
 case class Ship(id: String, port: Option[Port], cargos: Set[Cargo]) extends Entity[String] {
-  def load(c: Cargo): State[Ship, LoadEvent] = {
-    require(port.isDefined, "cannot load/unload a ship when not in a port")
+  def load(c: Cargo): State[Ship, LoadEvent] = State {
     val now = new Date
-    State(s => (LoadEvent(this, c, now), this.copy(cargos = this.cargos + c)))
+    s => {
+      require(s.port.isDefined, "cannot load/unload a ship when not in a port")
+      (LoadEvent(s, c, now), s.copy(cargos = s.cargos + c)) }
   }
-  def leave(): State[Ship, DepartureEvent] = {
-    require(port.isDefined, "cannot leave from nowhere")
+  def leave(): State[Ship, DepartureEvent] = State {
     val now = new Date
-    State(s => (DepartureEvent(this, this.port.get, now), this.copy(port=None)))
+    s => {
+      require(s.port.isDefined, "cannot leave from nowhere")
+      (DepartureEvent(s, s.port.get, now), s.copy(port=None))
+    }
   }
-  def arrive(at: Port): State[Ship, ArrivalEvent] = {
-    require(!port.isDefined, "must have left before arriving")
+  def arrive(at: Port): State[Ship, ArrivalEvent] = State {
     val now = new Date
-    State(s => (ArrivalEvent(this, at, now), this.copy(port=Some(at))))
+    s => {
+      require(!s.port.isDefined, "must have left before arriving")
+      (ArrivalEvent(s, at, now), s.copy(port=Some(at)))
+    }
   }
 }
 object Ships extends MapBasedRepository[Ship]
